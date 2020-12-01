@@ -1,59 +1,75 @@
+use io::Result;
+
 use crate::solver::Solver;
+use std::collections::HashSet;
 use std::io::{self, BufRead, BufReader};
 
 pub struct Problem;
 
 impl Solver for Problem {
-    type Input = Vec<u64>;
-    type Output = u64;
+    type Input = Vec<i32>;
+    type Output = i32;
 
     fn parse_input<R: io::Read + io::Seek>(&self, r: R) -> Self::Input {
-        let r = BufReader::new(r);
-        r.lines().flatten().flat_map(|l| l.parse()).collect()
+        BufReader::new(r)
+            .lines()
+            .filter_map(Result::ok)
+            .flat_map(|l| l.parse())
+            .collect()
     }
 
     fn solve_first(&self, input: &Self::Input) -> Self::Output {
-        let x = input.iter().cloned();
-        x.map(module_fuel).sum()
+        let values = find_pair(input, 2020).unwrap();
+        values.into_iter().fold(1, |a, b| a * b)
     }
 
     fn solve_second(&self, input: &Self::Input) -> Self::Output {
-        let x = input.iter().cloned();
-        x.map(total_fuel_mass).sum()
+        let values = find_three(input, 2020);
+        values.into_iter().fold(1, |a, b| a * b)
     }
 }
 
-fn module_fuel(mass: u64) -> u64 {
-    ((mass as f64 / 3f64).floor() - 2f64) as u64
+fn find_pair(input: &Vec<i32>, target: i32) -> Option<Vec<i32>> {
+    let set: HashSet<i32> = input.iter().cloned().collect();
+    let value = set.iter().find(|&x| set.get(&(target - x)).is_some());
+
+    match value {
+        Some(x) => Some(vec![*x, target - x]),
+        None => None,
+    }
 }
 
-fn total_fuel_mass(mass: u64) -> u64 {
-    match mass {
-        0 => 0,
-        _ => {
-            let fuel = module_fuel(mass);
-            fuel + total_fuel_mass(fuel).max(0)
+fn find_three(input: &Vec<i32>, target: i32) -> Vec<i32> {
+    let set: HashSet<i32> = input.iter().cloned().collect();
+    for a in &set {
+        let subset: Vec<i32> = input.iter().cloned().filter(|&b| b != *a).collect();
+        let pair = find_pair(&subset, target - a);
+        if let Some(pair) = pair {
+            return pair.into_iter().chain(vec![*a]).collect();
         }
     }
+
+    panic!("Not found")
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_module_fuel() {
-        assert_eq!(module_fuel(12), 2);
-        assert_eq!(module_fuel(14), 2);
-        assert_eq!(module_fuel(1969), 654);
-        assert_eq!(module_fuel(100_756), 33583);
-        assert_eq!(module_fuel(1), 0);
+    fn set_from_vec(input: &Vec<i32>) -> HashSet<i32> {
+        input.iter().cloned().collect()
     }
 
     #[test]
-    fn test_total_fuel_mass() {
-        assert_eq!(total_fuel_mass(14), 2);
-        assert_eq!(total_fuel_mass(1969), 966);
-        assert_eq!(total_fuel_mass(100_756), 50346);
+    fn test_fin_pair() {
+        let result = set_from_vec(&find_pair(&vec![1, 2, 3], 5).unwrap());
+        assert_eq!(result, set_from_vec(&vec![2, 3]));
+    }
+
+    #[test]
+    fn test_find_three() {
+        let example: Vec<i32> = vec![1721, 979, 366, 299, 675, 1456];
+        let result = set_from_vec(&find_three(&example, 2020));
+        assert_eq!(result, set_from_vec(&vec![979, 366, 675]));
     }
 }
