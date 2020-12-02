@@ -1,9 +1,7 @@
-use io::Result;
-extern crate regex;
-
-use regex::Regex;
-
 use crate::solver::Solver;
+use io::Result;
+use lazy_static::lazy_static;
+use regex::Regex;
 use std::io::{self, BufRead, BufReader};
 
 pub struct Problem;
@@ -16,32 +14,21 @@ pub struct PasswordCheck {
     max: u32,
 }
 
+lazy_static! {
+    static ref RE: Regex = Regex::new(r"(\d+)-(\d+) (.+): (.+)").unwrap();
+}
+
 impl PasswordCheck {
     fn from_str(s: String) -> Self {
-        // {min}-{max} {char}: {password}
-        let first_split: Vec<&str> = s.split(':').collect();
-        let pass = first_split[1].strip_prefix(" ").unwrap();
-        let second_split: Vec<&str> = s.split(' ').collect();
-        let required_char = second_split[1].chars().next().unwrap();
-        let range_split: Vec<u32> = second_split[0]
-            .split("-")
-            .map(|s| s.parse().unwrap())
-            .collect();
-        PasswordCheck {
-            password: String::from(pass),
-            required_char: required_char,
-            min: range_split[0],
-            max: range_split[1],
+        if !RE.is_match(&s) {
+            panic!("Bad format: {}", s);
         }
-    }
-
-    fn from_str_regex(s: String) -> Self {
-        // TODO
+        let captures = RE.captures(&s).unwrap();
         PasswordCheck {
-            password: String::from("a"),
-            required_char: 'a',
-            min: 1,
-            max: 2,
+            password: String::from(&captures[4]),
+            required_char: captures[3].chars().next().unwrap(),
+            min: captures[1].parse().unwrap(),
+            max: captures[2].parse().unwrap(),
         }
     }
 
