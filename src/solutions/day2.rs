@@ -9,9 +9,8 @@ pub struct Problem;
 #[derive(PartialEq, Debug)]
 pub struct PasswordCheck {
     password: String,
-    required_char: char,
-    min: u32,
-    max: u32,
+    letter: char,
+    bounds: (usize, usize),
 }
 
 lazy_static! {
@@ -26,31 +25,25 @@ impl PasswordCheck {
         let captures = RE.captures(&s).unwrap();
         PasswordCheck {
             password: String::from(&captures[4]),
-            required_char: captures[3].chars().next().unwrap(),
-            min: captures[1].parse().unwrap(),
-            max: captures[2].parse().unwrap(),
+            letter: captures[3].chars().next().unwrap(),
+            bounds: (captures[1].parse().unwrap(), captures[2].parse().unwrap()),
         }
     }
 
     fn is_valid(&self) -> bool {
-        let char_count: u32 = self
-            .password
-            .chars()
-            .filter(|c| *c == self.required_char)
-            .count() as u32;
-        (self.min..=self.max).contains(&char_count)
+        let char_count = self.password.chars().filter(|c| *c == self.letter).count();
+        (self.bounds.0..=self.bounds.1).contains(&char_count)
     }
 
     fn is_valid_2(&self) -> bool {
         let chars: Vec<char> = self.password.chars().collect();
-        (chars[self.max as usize - 1] == self.required_char)
-            ^ (chars[self.min as usize - 1] == self.required_char)
+        (chars[self.bounds.0 - 1] == self.letter) ^ (chars[self.bounds.1 - 1] == self.letter)
     }
 }
 
 impl Solver for Problem {
     type Input = Vec<PasswordCheck>;
-    type Output = u32;
+    type Output = usize;
 
     fn parse_input<R: io::Read + io::Seek>(&self, r: R) -> Self::Input {
         BufReader::new(r)
@@ -61,11 +54,11 @@ impl Solver for Problem {
     }
 
     fn solve_first(&self, input: &Self::Input) -> Self::Output {
-        input.iter().filter(|check| check.is_valid()).count() as u32
+        input.iter().filter(|check| check.is_valid()).count()
     }
 
     fn solve_second(&self, input: &Self::Input) -> Self::Output {
-        input.iter().filter(|check| check.is_valid_2()).count() as u32
+        input.iter().filter(|check| check.is_valid_2()).count()
     }
 }
 
@@ -78,9 +71,8 @@ mod tests {
         let input = "3-4 t: dttt";
         let expected = PasswordCheck {
             password: String::from("dttt"),
-            required_char: 't',
-            min: 3,
-            max: 4,
+            letter: 't',
+            bounds: (3, 4),
         };
         assert_eq!(expected, PasswordCheck::from_str(String::from(input)));
     }
