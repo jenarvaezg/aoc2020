@@ -33,24 +33,18 @@ impl PasswordCheck {
     }
 
     fn is_valid(&self) -> bool {
-        let required_char_count: u32 = self
+        let char_count: u32 = self
             .password
             .chars()
             .filter(|c| *c == self.required_char)
             .count() as u32;
-        required_char_count >= self.min && required_char_count <= self.max
+        (self.min..=self.max).contains(&char_count)
     }
 
     fn is_valid_2(&self) -> bool {
-        self.password
-            .chars()
-            .enumerate()
-            .filter(|e| {
-                (e.0 as u32 == self.max - 1 || e.0 as u32 == self.min - 1)
-                    && e.1 == self.required_char
-            })
-            .count()
-            == 1
+        let chars: Vec<char> = self.password.chars().collect();
+        (chars[self.max as usize - 1] == self.required_char)
+            ^ (chars[self.min as usize - 1] == self.required_char)
     }
 }
 
@@ -93,7 +87,7 @@ mod tests {
 
     #[test]
     fn test_password_check_is_valid() {
-        let c1 = PasswordCheck::from_str(String::from("3-4 t: dttt"));
+        let c1 = PasswordCheck::from_str(String::from("3-4 t: dtttt"));
         let c2 = PasswordCheck::from_str(String::from("1-3 b: cdefg"));
         let c3 = PasswordCheck::from_str(String::from("2-9 c: ccccccccc"));
         assert!(c1.is_valid());
