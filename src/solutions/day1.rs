@@ -42,8 +42,8 @@ fn find_pair(input: &Vec<i32>, target: i32) -> Option<Vec<i32>> {
 fn find_three(input: &Vec<i32>, target: i32) -> Vec<i32> {
     let set: HashSet<i32> = input.iter().cloned().collect();
     for a in &set {
-        let subset: Vec<i32> = input.iter().cloned().filter(|&b| b != *a).collect();
-        let pair = find_pair(&subset, target - a);
+        let input_no_a: Vec<i32> = input.iter().cloned().filter(|&b| b != *a).collect();
+        let pair = find_pair(&input_no_a, target - a);
         if let Some(pair) = pair {
             return pair.into_iter().chain(vec![*a]).collect();
         }

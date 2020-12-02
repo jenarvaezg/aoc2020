@@ -6,7 +6,7 @@ use std::env;
 fn main() {
     let day: u32 = env::args()
         .nth(1)
-        .unwrap_or(String::from("1"))
+        .unwrap_or(String::from("2"))
         .parse()
         .unwrap();
 
