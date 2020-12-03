@@ -32,8 +32,8 @@ fn trees_in_slope(grid: &Grid, slope: (usize, usize)) -> usize {
         .filter(|(i, y)| {
             let x = (i * slope.0) % grid.w;
             match grid.get((x, *y)) {
-                Some(val) => *val == '#',
-                None => false,
+                Some('#') => true,
+                _ => false,
             }
         })
         .count()
