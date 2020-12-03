@@ -54,11 +54,11 @@ impl Solver for Problem {
     }
 
     fn solve_first(&self, input: &Self::Input) -> Self::Output {
-        input.iter().filter(|check| check.is_valid()).count()
+        input.iter().filter(|&check| check.is_valid()).count()
     }
 
     fn solve_second(&self, input: &Self::Input) -> Self::Output {
-        input.iter().filter(|check| check.is_valid_2()).count()
+        input.iter().filter(|&check| check.is_valid_2()).count()
     }
 }
 
