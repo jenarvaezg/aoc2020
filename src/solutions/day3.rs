@@ -6,7 +6,7 @@ pub struct Problem;
 
 impl Solver for Problem {
     type Input = Grid;
-    type Output = i64;
+    type Output = usize;
 
     fn parse_input<R: io::Read + io::Seek>(&self, r: R) -> Self::Input {
         Grid::from_reader(r).unwrap()
@@ -18,25 +18,25 @@ impl Solver for Problem {
 
     fn solve_second(&self, input: &Self::Input) -> Self::Output {
         let slopes: Vec<(usize, usize)> = vec![(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)];
-        let mut total = 1;
-        for slope in slopes {
-            total *= trees_in_slope(input, slope);
-        }
-        total
+
+        slopes
+            .into_iter()
+            .fold(1, |acc, slope| acc * trees_in_slope(input, slope))
     }
 }
 
-fn trees_in_slope(grid: &Grid, slope: (usize, usize)) -> i64 {
-    let mut count = 0;
-    for y in (0..grid.h).step_by(slope.1) {
-        let x = (y * slope.0 / slope.1) % grid.w;
-        if let Some(val) = grid.get((x, y)) {
-            if *val == '#' {
-                count += 1
+fn trees_in_slope(grid: &Grid, slope: (usize, usize)) -> usize {
+    (0..grid.h)
+        .step_by(slope.1)
+        .enumerate()
+        .filter(|(i, y)| {
+            let x = (i * slope.0) % grid.w;
+            match grid.get((x, *y)) {
+                Some(val) => *val == '#',
+                None => false,
             }
-        }
-    }
-    count
+        })
+        .count()
 }
 
 #[cfg(test)]
