@@ -9,7 +9,7 @@ impl Solver for Problem {
     type Output = i64;
 
     fn parse_input<R: io::Read + io::Seek>(&self, r: R) -> Self::Input {
-        Grid::from_reader(r)
+        Grid::from_reader(r).unwrap()
     }
 
     fn solve_first(&self, input: &Self::Input) -> Self::Output {
@@ -43,7 +43,7 @@ fn trees_in_slope(grid: &Grid, slope: (usize, usize)) -> i64 {
 mod tests {
     use super::*;
 
-    fn test_input() -> String {
+    fn test_grid() -> Grid {
         String::from(
             "..##.......\n\
             #...#...#..\n\
@@ -57,11 +57,13 @@ mod tests {
             #...##....#\n\
             .#..#...#.#",
         )
+        .parse()
+        .unwrap()
     }
 
     #[test]
     fn test_trees_in_slope() {
-        let grid: Grid = test_input().parse().unwrap();
+        let grid: Grid = test_grid();
         assert_eq!(2, trees_in_slope(&grid, (1, 1)));
         assert_eq!(7, trees_in_slope(&grid, (3, 1)));
         assert_eq!(3, trees_in_slope(&grid, (5, 1)));

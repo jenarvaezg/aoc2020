@@ -49,13 +49,13 @@ pub struct Grid {
 }
 
 impl Grid {
-    pub fn from_reader<R: Read>(r: R) -> Self {
+    pub fn from_reader<R: Read>(r: R) -> Result<Self, ()> {
         let lines: Vec<String> = BufReader::new(r).lines().filter_map(Result::ok).collect();
         let h = lines.len();
-        let w = lines.first().map_or(0, |c| c.len());
-        let cells: Vec<char> = lines.iter().map(|s| s.chars()).flatten().collect();
+        let w = lines[0].len();
+        let cells: Vec<char> = lines.iter().flat_map(|s| s.chars()).collect();
 
-        Grid { cells, h, w }
+        Ok(Grid { cells, h, w })
     }
 
     pub fn get(&self, c: impl Coord) -> Option<&char> {
@@ -67,11 +67,6 @@ impl FromStr for Grid {
     type Err = ();
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let lines: Vec<&str> = s.split("\n").collect();
-        let h = lines.len();
-        let w = lines.first().map_or(0, |c| c.len());
-        let cells: Vec<char> = lines.iter().map(|s| s.chars()).flatten().collect();
-
-        Ok(Grid { cells, h, w })
+        Grid::from_reader(s.as_bytes())
     }
 }
