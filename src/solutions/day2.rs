@@ -19,9 +19,6 @@ lazy_static! {
 
 impl PasswordCheck {
     fn from_str(s: String) -> Self {
-        if !RE.is_match(&s) {
-            panic!("Bad format: {}", s);
-        }
         let captures = RE.captures(&s).unwrap();
         PasswordCheck {
             password: String::from(&captures[4]),
