@@ -1,4 +1,5 @@
 mod grid;
+mod passport;
 mod solutions;
 mod solver;
 use crate::solutions::solve;
