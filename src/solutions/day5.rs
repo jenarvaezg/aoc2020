@@ -59,6 +59,17 @@ fn seat_bin_search(s: &str, matchers: (char, char)) -> usize {
     mid
 }
 
+#[allow(dead_code)]
+fn seat_from_bin_shift(s: &str, matchers: (char, char)) -> usize {
+    let mut val: usize = 0;
+    for (i, c) in s.chars().rev().enumerate() {
+        if c == matchers.1 {
+            val ^= 1 << i;
+        }
+    }
+    val
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
