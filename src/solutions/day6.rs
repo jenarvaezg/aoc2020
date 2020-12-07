@@ -45,7 +45,7 @@ fn get_answers_set_intersection(s: &str) -> HashSet<char> {
     sets.next()
         .map(|set| {
             sets.fold(set, |agg, other| {
-                agg.intersection(&other).cloned().collect()
+                agg.intersection(&other).copied().collect()
             })
         })
         .unwrap()
