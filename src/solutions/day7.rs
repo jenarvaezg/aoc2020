@@ -67,16 +67,10 @@ fn line_to_bags(s: &str) -> (String, Vec<BagContainment>) {
 }
 
 fn contains_color(bags: &BagMap, current: &str, color: &str) -> bool {
-    if current == color {
-        return true;
-    }
-
-    if let Some(containments) = bags.get(current) {
-        return containments
+    current == color
+        || bags[current]
             .iter()
-            .any(|x| contains_color(bags, &x.bag, color));
-    }
-    false
+            .any(|x| contains_color(bags, &x.bag, color))
 }
 
 fn bag_count(bags: &BagMap, current: &str) -> usize {

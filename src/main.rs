@@ -8,7 +8,7 @@ use std::env;
 fn main() {
     let day: u32 = env::args()
         .nth(1)
-        .unwrap_or(String::from("7"))
+        .unwrap_or(String::from("8"))
         .parse()
         .unwrap();
 
