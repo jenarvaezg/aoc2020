@@ -21,14 +21,12 @@ impl Solver for Problem {
     fn solve_first(&self, input: &Self::Input) -> Self::Output {
         let preamble_count = 25;
         input
-            .windows(preamble_count)
-            .filter_map(|window| {
-                find_pair(&window[0..preamble_count].to_vec(), window[preamble_count])
+            .windows(preamble_count + 1)
+            .filter(|window| {
+                find_pair(&window[0..preamble_count].to_vec(), window[preamble_count]).is_none()
             })
             .next()
-            .unwrap()
-            .iter()
-            .sum()
+            .unwrap()[preamble_count]
     }
 
     fn solve_second(&self, input: &Self::Input) -> Self::Output {
