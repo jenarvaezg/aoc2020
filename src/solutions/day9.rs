@@ -1,8 +1,8 @@
 use io::Result;
 
 use crate::solver::Solver;
-use std::collections::HashSet;
 use std::io::{self, BufRead, BufReader};
+use std::{cmp::Ordering, collections::HashSet};
 
 pub struct Problem;
 
@@ -30,18 +30,24 @@ impl Solver for Problem {
     }
 
     fn solve_second(&self, input: &Self::Input) -> Self::Output {
+        let (mut left, mut right, mut sum) = (0, 0, 0);
         let target = 85848519;
-        let max_pos = input.iter().position(|&x| x == target).unwrap();
-
-        for n in 2..max_pos {
-            for window in input[..max_pos].windows(n) {
-                if window.iter().sum::<isize>() == target {
+        loop {
+            match sum.cmp(&target) {
+                Ordering::Greater => {
+                    sum -= input[left];
+                    left += 1
+                }
+                Ordering::Less => {
+                    sum += input[right];
+                    right += 1
+                }
+                Ordering::Equal => {
+                    let window = &input[left..right];
                     return window.iter().min().unwrap() + window.iter().max().unwrap();
                 }
             }
         }
-
-        panic!("Not found!");
     }
 }
 
