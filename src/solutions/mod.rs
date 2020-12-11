@@ -1,4 +1,6 @@
 mod day1;
+mod day10;
+mod day11;
 mod day2;
 mod day3;
 mod day4;
@@ -7,7 +9,6 @@ mod day6;
 mod day7;
 mod day8;
 mod day9;
-mod day10;
 use crate::solver::Solver;
 use std::fs::File;
 
@@ -33,6 +34,7 @@ pub fn solve(day: u32) {
         8 => day8::Problem {}.solve(day_file),
         9 => day9::Problem {}.solve(day_file),
         10 => day10::Problem {}.solve(day_file),
+        11 => day11::Problem {}.solve(day_file),
         d => println!("Day {} has not been solved yet", d),
     }
 }
