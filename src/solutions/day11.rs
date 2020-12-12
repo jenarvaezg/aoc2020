@@ -65,7 +65,6 @@ fn run_step(current: char, adjacents: usize, occupied_tolerance: usize) -> (char
         }
         '#' => {
             if adjacents >= occupied_tolerance {
-                //into_iter().filter(|&x| x == '#').count() >= occupied_tolerance {
                 ('L', true)
             } else {
                 ('#', false)
