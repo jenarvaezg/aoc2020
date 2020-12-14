@@ -1,4 +1,3 @@
-use bitvec::{order::Lsb0, slice::BitSlice};
 use io::Result;
 
 use crate::solver::Solver;
@@ -65,7 +64,7 @@ impl Solver for Problem {
         for instruction in input.iter().clone() {
             match instruction {
                 Instruction::Mask(mask_values) => {
-                    mask = mask_from_str_with_x(mask_values);
+                    mask = mask_from_str(mask_values);
                 }
                 Instruction::Mem(address, value) => {
                     for new_address in apply_address_mask(&mask, *address).iter() {
@@ -80,9 +79,12 @@ impl Solver for Problem {
 
 fn apply_mask(mask: &Mask, value: u64) -> u64 {
     let mut cloned_value = value.clone();
-    let bits = BitSlice::<Lsb0, _>::from_element_mut(&mut cloned_value);
-    for (pos, value) in mask.iter() {
-        bits.set(*pos, value.unwrap());
+    for (&pos, &value) in mask.iter().filter(|(_, &value)| value.is_some()) {
+        let mask_val = 2u64.pow(pos as u32);
+        match value.unwrap() {
+            true => cloned_value |= mask_val,
+            false => cloned_value &= !(mask_val),
+        }
     }
     cloned_value
 }
@@ -91,11 +93,11 @@ fn apply_address_mask(mask: &Mask, value: u64) -> Vec<u64> {
     let mut cloned_value = value.clone();
     let mut xs = Vec::<usize>::new();
 
-    for (i, mask_val) in mask {
+    for (&i, &mask_val) in mask {
         match mask_val {
-            Some(true) => cloned_value |= 2u64.pow(*i as u32),
+            Some(true) => cloned_value |= 2u64.pow(i as u32),
             Some(false) => {}
-            None => xs.push(*i),
+            None => xs.push(i),
         }
     }
 
@@ -113,26 +115,15 @@ fn apply_address_mask(mask: &Mask, value: u64) -> Vec<u64> {
     values.iter().map(|&x| x).collect()
 }
 
-fn mask_from_str_with_x(s: &str) -> Mask {
-    let mut mask = Mask::new();
-
-    for (i, x) in s.chars().rev().enumerate() {
-        let v = match x {
+fn mask_from_str(s: &str) -> Mask {
+    s.chars()
+        .rev()
+        .map(|x| match x {
             '1' => Some(true),
             '0' => Some(false),
             'X' => None,
             _ => unreachable!(),
-        };
-        mask.insert(i, v);
-    }
-    mask
-}
-
-fn mask_from_str(s: &str) -> Mask {
-    let mut mask = Mask::new();
-
-    for (i, x) in s.chars().rev().enumerate().filter(|(_, x)| *x != 'X') {
-        mask.insert(i, if x == '1' { Some(true) } else { Some(false) });
-    }
-    mask
+        })
+        .enumerate()
+        .collect()
 }
