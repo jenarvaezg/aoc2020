@@ -45,7 +45,7 @@ impl Solver for Problem {
     fn solve_first(&self, input: &Self::Input) -> Self::Output {
         let mut mask = Mask::new();
         let mut memory = HashMap::<u64, u64>::new();
-        for instruction in input.iter().clone() {
+        for instruction in input {
             match instruction {
                 Instruction::Mask(mask_values) => {
                     mask = mask_from_str(mask_values);
@@ -61,7 +61,7 @@ impl Solver for Problem {
     fn solve_second(&self, input: &Self::Input) -> Self::Output {
         let mut mask = Mask::new();
         let mut memory = HashMap::<u64, u64>::new();
-        for instruction in input.iter().clone() {
+        for instruction in input {
             match instruction {
                 Instruction::Mask(mask_values) => {
                     mask = mask_from_str(mask_values);
