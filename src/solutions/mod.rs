@@ -5,6 +5,7 @@ mod day12;
 mod day13;
 mod day14;
 mod day15;
+mod day16;
 mod day2;
 mod day3;
 mod day4;
@@ -43,6 +44,7 @@ pub fn solve(day: u32) {
         13 => day13::Problem {}.solve(day_file),
         14 => day14::Problem {}.solve(day_file),
         15 => day15::Problem {}.solve(day_file),
+        16 => day16::Problem {}.solve(day_file),
         d => println!("Day {} has not been solved yet", d),
     }
 }
